@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function(){
     const totalPrice = document.getElementById('total-price')
     const checkoutBtn = document.getElementById('checkout-btn')
     const emptyCart = document.getElementById('empty-cart')
-
+    const cartList = document.getElementById('cart-list')
     const products = [
         {id:1, name:'Product 1',price:25.75},
         {id:2, name:'Product 2',price:29.99},
@@ -40,8 +40,10 @@ document.addEventListener('DOMContentLoaded', function(){
                 if(prodsInCart.length === 0)
                 {
                     prodsInCart.push(x)
-                    console.log(prodsInCart);
-                    
+                    totalPriceAmt += x.price
+                    totalPriceAmt = Number(totalPriceAmt.toFixed(2))
+                   
+                    putToDom(prodsInCart)
                 }
                 else{
                     let alreadyInCart = false
@@ -60,10 +62,46 @@ document.addEventListener('DOMContentLoaded', function(){
                     else{
                         prodsInCart.push(x)
                         console.log(prodsInCart);
+                        totalPriceAmt += x.price
+                        totalPriceAmt = Number(totalPriceAmt.toFixed(2))
                         
+                        putToDom(prodsInCart)
                     }
                 }
             }     
+    })
+
+    function putToDom(prodsInCart)
+    {
+        if(prodsInCart.length === 0)
+        {
+            cartTotal.classList.add('hidden')
+            emptyCart.classList.remove('hidden')
+            cartList.classList.add('hidden')
+
+        }
+        else{
+            cartList.innerHTML = '' // We'll be rendering each and every item once again, each time a new item gets added in the cart, this helps us in the checkout process. 
+            prodsInCart.forEach((prod)=>{
+                const li = document.createElement('li')
+                li.innerHTML = `
+                  <span>${prod.name}</span>
+                `
+                cartList.appendChild(li)
+                totalPrice.textContent = `$${totalPriceAmt}`
+            })
+            cartTotal.classList.remove('hidden')
+            cartList.classList.remove('hidden')
+            emptyCart.classList.add('hidden')
+        }
+    }
+
+
+    checkoutBtn.addEventListener('click', function(){
+        totalPriceAmt = 0
+        prodsInCart = []
+        putToDom(prodsInCart)     
+       alert('Checked out successfully !')
     })
 
 })

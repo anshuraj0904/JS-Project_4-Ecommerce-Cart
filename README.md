@@ -1,0 +1,1 @@
+# A basic add to cart project using Vanilla JS
