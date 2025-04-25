@@ -12,8 +12,13 @@ document.addEventListener('DOMContentLoaded', function(){
         {id:3, name:'Product 3',price:49.99},       
     ] 
 
-    let totalPriceAmt = 0
-    let prodsInCart = []
+    
+    let atBeginning_prods = JSON.parse(localStorage.getItem(('Items'))) || []
+    let atBeginning_price = JSON.parse(localStorage.getItem(('Total'))) || 0
+    let totalPriceAmt = atBeginning_price
+    let prodsInCart = atBeginning_prods
+    putToDom(atBeginning_prods)
+
 
     // Putting the elements into the DOM from the products, array of objects. 
     products.forEach((product)=>{
@@ -25,7 +30,8 @@ document.addEventListener('DOMContentLoaded', function(){
         productDiv.classList.add('product')
         productList.appendChild(productDiv)
     })
-  
+
+    let toBeInDom = []
     productList.addEventListener('click', function(e){
         // Using the event bubbling to ensure that the click works only if the button('Add to Cart') is clicked
         let x = {}
@@ -40,10 +46,14 @@ document.addEventListener('DOMContentLoaded', function(){
                 if(prodsInCart.length === 0)
                 {
                     prodsInCart.push(x)
+                    localStorage.setItem('Items', JSON.stringify(prodsInCart))
+                    toBeInDom = JSON.parse(localStorage.getItem('Items'))
+                    console.log(toBeInDom)                         
                     totalPriceAmt += x.price
                     totalPriceAmt = Number(totalPriceAmt.toFixed(2))
+                    localStorage.setItem('Total', JSON.stringify(totalPriceAmt)) 
                    
-                    putToDom(prodsInCart)
+                    putToDom(toBeInDom)
                 }
                 else{
                     let alreadyInCart = false
@@ -63,16 +73,19 @@ document.addEventListener('DOMContentLoaded', function(){
                         prodsInCart.push(x)
                         totalPriceAmt += x.price
                         totalPriceAmt = Number(totalPriceAmt.toFixed(2))
-                        
-                        putToDom(prodsInCart)
+                        localStorage.setItem('Items', JSON.stringify(prodsInCart))
+                        toBeInDom = JSON.parse(localStorage.getItem('Items'))
+                        console.log(toBeInDom);
+                        localStorage.setItem('Total', JSON.stringify(totalPriceAmt)) 
+                        putToDom(toBeInDom)
                     }
                 }
             }     
     })
 
-    function putToDom(prodsInCart)
+    function putToDom(some_abc)
     {
-        if(prodsInCart.length === 0)
+        if(some_abc.length === 0)
         {
             cartTotal.classList.add('hidden')
             emptyCart.classList.remove('hidden')
@@ -81,10 +94,11 @@ document.addEventListener('DOMContentLoaded', function(){
         }
         else{
             cartList.innerHTML = '' // We'll be rendering each and every item once again, each time a new item gets added in the cart, this helps us in the checkout process. 
-            prodsInCart.forEach((prod)=>{
+            some_abc.forEach((prod)=>{
                 const li = document.createElement('li')
                 li.innerHTML = `
                   <span>${prod.name}</span>
+                  <button class="remove-btn" data-id="${prod.id}">Remove</button>
                 `
                 cartList.appendChild(li)
                 totalPrice.textContent = `$${totalPriceAmt}`
@@ -99,8 +113,24 @@ document.addEventListener('DOMContentLoaded', function(){
     checkoutBtn.addEventListener('click', function(){
         totalPriceAmt = 0
         prodsInCart = []
-        putToDom(prodsInCart)     
-       alert('Checked out successfully !')
+        localStorage.setItem('Items', JSON.stringify(prodsInCart))
+        localStorage.setItem('Total', JSON.stringify(totalPriceAmt))
+        toBeInDom = JSON.parse(localStorage.getItem('Items'))
+        alert('Checked out successfully !')
+        putToDom(toBeInDom)     
     })
 
+     cartList.addEventListener('click', function(e){
+        e.preventDefault()
+        idToRemove =  e.target.getAttribute("data-id")
+        let priceTobeDeducted =Number(prodsInCart.find(prodsInCart => prodsInCart.id == idToRemove)?.price).toFixed(2)
+        totalPriceAmt -= priceTobeDeducted
+        totalPriceAmt = Number(totalPriceAmt.toFixed(2))
+        localStorage.setItem('Total', JSON.stringify(totalPriceAmt))
+        let updatedProds = prodsInCart.filter(prodsInCart => prodsInCart.id != idToRemove) 
+        prodsInCart = updatedProds
+        window.location.reload()
+        localStorage.setItem('Items', JSON.stringify(prodsInCart))
+
+    })
 })

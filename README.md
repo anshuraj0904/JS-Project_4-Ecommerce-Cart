@@ -5,3 +5,4 @@
 2. Event Bubbling
 3. Event Capturing
 4. Event Propagation
+5. Local Storage
