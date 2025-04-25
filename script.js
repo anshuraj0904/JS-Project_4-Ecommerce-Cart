@@ -61,7 +61,6 @@ document.addEventListener('DOMContentLoaded', function(){
                     }
                     else{
                         prodsInCart.push(x)
-                        console.log(prodsInCart);
                         totalPriceAmt += x.price
                         totalPriceAmt = Number(totalPriceAmt.toFixed(2))
                         
